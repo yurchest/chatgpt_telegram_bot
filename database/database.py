@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+import pytz
 
 conn = sqlite3.connect('database/openai_telegram.db')
 cursor = conn.cursor()
@@ -16,7 +17,7 @@ def is_user_exists(telegram_id):
 
 def add_user(name: str, username: str, telegram_id: int):
     values = [
-        (name, username, telegram_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"), 1, "false"),
+        (name, username, telegram_id, datetime.now(pytz.timezone("Europe/Moscow")).strftime("%Y-%m-%d %H:%M:%S"), 1, "false"),
     ]
     sqlite_insert_query = """
                             INSERT INTO users(name, username, telegram_id, register_date, number_of_requests, paid)
