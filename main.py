@@ -18,23 +18,6 @@ logging.basicConfig(level=logging.INFO)
 active_requests_id = set()
 
 
-@dp.message_handler(commands=['start'])
-async def start(message):
-    if not is_user_exists(message.from_user.id):
-        add_user(
-            name=message.from_user.first_name,
-            username=message.from_user.username,
-            telegram_id=message.from_user.id
-        )
-
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("/reset_conversation"))
-    init_conversation()
-    await message.answer(
-        f"Привет, {message.from_user.first_name}. Это ChatGPT бот. Можете задавать интересующий вас вопрос чат.",
-        reply_markup=markup)
-
-
 def rate_limit_error_handler(func):
     """
         Декоратор ,отслеживающий ошибку RateLimitError и повторяет запросы с периодом retry_after
@@ -70,12 +53,41 @@ def recurrent_request_handler(func):
     return wrapper_func
 
 
+def main_handler(func):
+    """
+        Декоратор общей функциональности
+    """
+
+    async def wrapper_func(message):
+        if not is_user_exists(message.from_user.id):
+            add_user(
+                name=message.from_user.first_name,
+                username=message.from_user.username,
+                telegram_id=message.from_user.id
+            )
+        increment_number_of_requests(message.from_user.id)
+        await func(message)
+
+    return wrapper_func
+
+
+@dp.message_handler(commands=['start'])
+@main_handler
+async def start(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(types.KeyboardButton("/reset_conversation"))
+    init_conversation()
+    await message.answer(
+        f"Привет, {message.from_user.first_name}. Это ChatGPT бот. Можете задавать интересующий вас вопрос чат.",
+        reply_markup=markup)
+
+
 @dp.message_handler(commands=['reset_conversation'])
+@main_handler
 @recurrent_request_handler
 @rate_limit_error_handler
 async def reset_conversation(message):
     init_conversation()
-    increment_number_of_requests(message.from_user.id)
     await message.answer(f"Диалог сброшен. Чем я могу помочь?")
 
 
@@ -92,11 +104,11 @@ async def admin(message):
 
 
 @dp.message_handler()
+@main_handler
 @recurrent_request_handler
 @rate_limit_error_handler
 async def main(message):
     response = chatgpt_conversation(message.text)
-    increment_number_of_requests(message.from_user.id)
     await message.answer(response)
 
 
