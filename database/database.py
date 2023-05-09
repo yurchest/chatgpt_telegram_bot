@@ -1,8 +1,10 @@
 import sqlite3
 from datetime import datetime
 import pytz
+from decouple import config
 
-conn = sqlite3.connect("PATH_TO_DB")
+PATH_TO_DB = config("PATH_TO_DB")
+conn = sqlite3.connect(PATH_TO_DB)
 cursor = conn.cursor()
 
 
