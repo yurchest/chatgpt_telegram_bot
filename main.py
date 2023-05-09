@@ -10,6 +10,7 @@ import os
 
 import json
 
+
 BOT_TOKEN = config("TELEGRAM_BOT_TOKEN")
 YOOKASSA_PAYMENT_TOKEN = config("YOOKASSA_PAYMENT_TOKEN")
 bot = Bot(BOT_TOKEN)
