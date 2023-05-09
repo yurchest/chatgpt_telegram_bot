@@ -1,4 +1,5 @@
 from gpt import *
+
 import logging
 from decouple import config
 import asyncio
@@ -17,6 +18,7 @@ dp = Dispatcher(bot)
 logging.basicConfig(level=logging.INFO)
 
 active_requests_id = set()
+active_msg_response = dict()
 
 
 def rate_limit_error_handler(func):
@@ -135,10 +137,15 @@ async def admin(message: types.message):
 @main_handler
 # @recurrent_request_handler
 @rate_limit_error_handler
-async def main(message: types.message):
-    msg = await message.answer(". . . . . . . . .")
+async def main(message: types.message, retry=False):
+    global active_msg_response
+    if message.message_id not in active_msg_response:
+        msg = await message.answer(". . . . . . . . .")
+        active_msg_response.update({message.message_id: msg.message_id})
     response = chatgpt_conversation(message.text)
-    await bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text=response)
+    print(active_msg_response[message.message_id])
+    await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id], text=response)
+    active_msg_response.pop(message.message_id)
 
 
 if __name__ == "__main__":

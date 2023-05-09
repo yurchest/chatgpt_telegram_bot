@@ -1,11 +1,13 @@
 from decouple import config
 import openai
 
+
 API_KEY = config("OPENAI_API_KEY")
 openai.api_key = API_KEY
 model_id = 'gpt-3.5-turbo'
 
 conversations = []
+
 
 
 def get_response(conversation_log):
