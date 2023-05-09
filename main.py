@@ -10,7 +10,6 @@ import os
 
 import json
 
-
 BOT_TOKEN = config("TELEGRAM_BOT_TOKEN")
 YOOKASSA_PAYMENT_TOKEN = config("YOOKASSA_PAYMENT_TOKEN")
 bot = Bot(BOT_TOKEN)
@@ -84,6 +83,22 @@ def main_handler(func):
     return wrapper_func
 
 
+def dots_handler(func):
+    """
+        Декоратор для . . . . . .
+    """
+
+    async def wrapper_func(message: types.message):
+        global active_msg_response
+        if message.message_id not in active_msg_response:
+            msg = await message.answer(". . . . . . . . .")
+            active_msg_response.update({message.message_id: msg.message_id})
+        await func(message)
+        active_msg_response.pop(message.message_id)
+
+    return wrapper_func
+
+
 @dp.message_handler(commands=['start'])
 @main_handler
 async def start(message: types.message):
@@ -114,40 +129,40 @@ async def success_payment(message: types.message):
 
 
 @dp.message_handler(commands=['reset_conversation'])
+@dots_handler
 @main_handler
 @recurrent_request_handler
 @rate_limit_error_handler
 async def reset_conversation(message):
     init_conversation()
-    await message.answer(f"Диалог сброшен. Чем я могу помочь?")
+    await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                text=f"Диалог сброшен. Чем я могу помочь?")
 
 
 @dp.message_handler(commands=['admin'])
+@dots_handler
 @recurrent_request_handler
 @rate_limit_error_handler
 async def admin(message: types.message):
     if message.from_user.username == 'yurchest':
         data = get_all_users()
         json_data = json.dumps(data, indent=2, ensure_ascii=False)
-        await message.answer(f"```\n{json_data}```", parse_mode=ParseMode.MARKDOWN)
+        await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                    text=f"```\n{json_data}```", parse_mode=ParseMode.MARKDOWN)
     else:
-        await message.answer("Вы не админ")
+        await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                    text="Вы не админ")
 
 
 @dp.message_handler()
+@dots_handler
 @main_handler
 # @recurrent_request_handler
 @rate_limit_error_handler
 async def main(message: types.message, retry=False):
-    global active_msg_response
-    if message.message_id not in active_msg_response:
-        msg = await message.answer(". . . . . . . . .")
-        active_msg_response.update({message.message_id: msg.message_id})
     response = chatgpt_conversation(message.text)
-    print(active_msg_response[message.message_id])
     await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
                                 text=response)
-    active_msg_response.pop(message.message_id)
 
 
 if __name__ == "__main__":
