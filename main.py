@@ -60,18 +60,21 @@ def main_handler(func):
     """
 
     async def wrapper_func(message: types.message):
-        await message.answer(
-            f"Привет, {message.from_user.first_name}! Я рад тебя видеть здесь! Я - чат-бот, созданный на базе GPT. Я могу помочь тебе в различных задачах и ответить на любые вопросы. Просто напиши мне, что ты хочешь узнать!")
         if not is_user_exists(message.from_user.id):
+            await message.answer(
+                f"Привет, {message.from_user.first_name}! Я рад тебя видеть здесь! Я - чат-бот, созданный на базе GPT. Я могу помочь тебе в различных задачах и ответить на любые вопросы. Просто напиши мне, что ты хочешь узнать! \n У тебя есть тестовый режим на 50 запросов. Удачи!")
             add_user(
                 name=message.from_user.first_name,
                 username=message.from_user.username,
                 telegram_id=message.from_user.id
             )
-        if not is_user_paid(message.from_user.id):
-            await message.answer(f"Чтобы получить доступ к боту, поблагодари разработчика монетой :)")
+            await message.answer(f"Чтобы получить полный доступ к боту, поблагодари разработчика монетой :)")
             await pay(message)
-            return
+        if not is_user_test_period(message.from_user.id):
+            if not is_user_paid(message.from_user.id):
+                await message.answer(f"Чтобы получить полный доступ к боту, поблагодари разработчика монетой :)")
+                await pay(message)
+                return
         increment_number_of_requests(message.from_user.id)
         await func(message)
 
@@ -103,8 +106,8 @@ async def pay(message: types.message):
 
 
 @dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
-async def succes_payment(message: types.message):
-    await message.answer(f"Успешно оплачено: {message.succesful_payment.order_info}")
+async def success_payment(message: types.message):
+    await message.answer(f"Успешно оплачено: \n{message.succesful_payment.order_info}")
 
 
 @dp.message_handler(commands=['reset_conversation'])

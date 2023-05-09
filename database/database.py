@@ -63,3 +63,12 @@ def is_user_paid(telegram_id):
         return True
     else:
         return False
+
+
+def is_user_test_period(telegram_id):
+    cursor.execute("SELECT number_of_requests FROM users WHERE telegram_id = ?", (telegram_id,))
+    [number_of_requests] = cursor.fetchone()  # fetch and unpack the only row our query returns
+    if number_of_requests < 50:
+        return True
+    else:
+        return False
