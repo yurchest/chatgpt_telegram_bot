@@ -112,6 +112,8 @@ async def start(message: types.message):
 
 @dp.message_handler(commands=['pay'])
 async def pay(message: types.message):
+    if is_user_paid(message.from_user.id):
+        await message.answer("У вас уже есть полный доступ. Но если вы хотите заплатить еще денюжку, то я всегда рад (^_^)")
     await bot.send_invoice(
         chat_id=message.chat.id,
         title="Опата подписки",
