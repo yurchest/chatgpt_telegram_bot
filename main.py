@@ -22,6 +22,7 @@ active_requests_id = set()
 active_msg_response = dict()
 
 
+
 def rate_limit_error_handler(func):
     """
         Декоратор ,отслеживающий ошибку RateLimitError и повторяет запросы с периодом retry_after
