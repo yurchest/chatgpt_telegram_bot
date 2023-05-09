@@ -17,7 +17,8 @@ def is_user_exists(telegram_id):
 
 def add_user(name: str, username: str, telegram_id: int):
     values = [
-        (name, username, telegram_id, datetime.now(pytz.timezone("Europe/Moscow")).strftime("%Y-%m-%d %H:%M:%S"), 1, "false"),
+        (name, username, telegram_id, datetime.now(pytz.timezone("Europe/Moscow")).strftime("%Y-%m-%d %H:%M:%S"), 1,
+         "false"),
     ]
     sqlite_insert_query = """
                             INSERT INTO users(name, username, telegram_id, register_date, number_of_requests, paid)
@@ -52,3 +53,13 @@ def get_all_users():
             "paid": user[5],
         })
     return result
+
+
+def is_user_paid(telegram_id):
+    cursor.execute("SELECT paid FROM users WHERE telegram_id = ?", (telegram_id,))
+    [is_paid] = cursor.fetchone()  # fetch and unpack the only row our query returns
+    print(is_paid)
+    if is_paid == "true":
+        return True
+    else:
+        return False

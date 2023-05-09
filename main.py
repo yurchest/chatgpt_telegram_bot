@@ -10,6 +10,7 @@ import os
 import json
 
 BOT_TOKEN = config("TELEGRAM_BOT_TOKEN")
+YOOKASSA_PAYMENT_TOKEN = config("YOOKASSA_PAYMENT_TOKEN")
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher(bot)
 # Включаем логирование, чтобы не пропустить важные сообщения
@@ -58,13 +59,19 @@ def main_handler(func):
         Декоратор общей функциональности
     """
 
-    async def wrapper_func(message):
+    async def wrapper_func(message: types.message):
+        await message.answer(
+            f"Привет, {message.from_user.first_name}! Я рад тебя видеть здесь! Я - чат-бот, созданный на базе GPT. Я могу помочь тебе в различных задачах и ответить на любые вопросы. Просто напиши мне, что ты хочешь узнать!")
         if not is_user_exists(message.from_user.id):
             add_user(
                 name=message.from_user.first_name,
                 username=message.from_user.username,
                 telegram_id=message.from_user.id
             )
+        if not is_user_paid(message.from_user.id):
+            await message.answer(f"Чтобы получить доступ к боту, поблагодари разработчика монетой :)")
+            await pay(message)
+            return
         increment_number_of_requests(message.from_user.id)
         await func(message)
 
@@ -73,13 +80,31 @@ def main_handler(func):
 
 @dp.message_handler(commands=['start'])
 @main_handler
-async def start(message):
+async def start(message: types.message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(types.KeyboardButton("/reset_conversation"))
     init_conversation()
     await message.answer(
-        f"Привет, {message.from_user.first_name}. Это ChatGPT бот. Можете задавать интересующий вас вопрос чат.",
+        "Можете задавать интересующий вас вопрос чат.",
         reply_markup=markup)
+
+
+@dp.message_handler(commands=['pay'])
+async def pay(message: types.message):
+    await bot.send_invoice(
+        chat_id=message.chat.id,
+        title="Опата подписки",
+        description="Опата подписки Yurchest BOT",
+        payload="invoice",
+        provider_token=YOOKASSA_PAYMENT_TOKEN,
+        currency="RUB",
+        prices=[types.LabeledPrice(label="Опата подписки", amount=100 * 100)]
+    )
+
+
+@dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
+async def succes_payment(message: types.message):
+    await message.answer(f"Успешно оплачено: {message.succesful_payment.order_info}")
 
 
 @dp.message_handler(commands=['reset_conversation'])
@@ -94,7 +119,7 @@ async def reset_conversation(message):
 @dp.message_handler(commands=['admin'])
 @recurrent_request_handler
 @rate_limit_error_handler
-async def admin(message):
+async def admin(message: types.message):
     if message.from_user.username == 'yurchest':
         data = get_all_users()
         json_data = json.dumps(data, indent=2, ensure_ascii=False)
@@ -107,7 +132,7 @@ async def admin(message):
 @main_handler
 @recurrent_request_handler
 @rate_limit_error_handler
-async def main(message):
+async def main(message: types.message):
     response = chatgpt_conversation(message.text)
     await message.answer(response)
 
