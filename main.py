@@ -10,7 +10,6 @@ import os
 
 import json
 
-
 BOT_TOKEN = config("TELEGRAM_BOT_TOKEN")
 YOOKASSA_PAYMENT_TOKEN = config("YOOKASSA_PAYMENT_TOKEN")
 bot = Bot(BOT_TOKEN)
@@ -19,9 +18,7 @@ dp = Dispatcher(bot)
 logging.basicConfig(level=logging.INFO)
 
 active_requests_id = set()
-
 active_msg_response = dict()
-
 
 
 def rate_limit_error_handler(func):
@@ -147,7 +144,8 @@ async def main(message: types.message, retry=False):
         active_msg_response.update({message.message_id: msg.message_id})
     response = chatgpt_conversation(message.text)
     print(active_msg_response[message.message_id])
-    await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id], text=response)
+    await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                text=response)
     active_msg_response.pop(message.message_id)
 
 
