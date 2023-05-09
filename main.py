@@ -105,6 +105,8 @@ async def start(message: types.message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(types.KeyboardButton("/reset_conversation"))
     markup.add(types.KeyboardButton("/help"))
+    if message.from_user.username == 'yurchest':
+        markup.add(types.KeyboardButton("/admin"))
     init_conversation()
     await message.answer(
         "Можете задавать интересующий вас вопрос чат.",
@@ -115,10 +117,11 @@ async def start(message: types.message):
 async def start(message: types.message):
     await message.answer(
         "Телеграм бот предназнчен для легкого взаимодействия с OpenAI API (ChatGPT).\n\
-        У пользователя есть 50 бесплатных пробных запросов для знакомства с сервисом. \n\
-        Чтобы получить неограниченное число запросов, необходимо оплатить подписку (на данный момент 100 руб.). \n\
-        Также присутствует кнопка меню '/reset_conversation', сбрасывающая историю сообщений (необходимо, \
-        если пользователь хочет поменять тему диалога).Данные пользователя хранятся в базе даных на выделенном сервере.")
+У пользователя есть 50 бесплатных пробных запросов для знакомства с сервисом. \n\
+Чтобы получить неограниченное число запросов, необходимо оплатить подписку (на данный момент 100 руб.). \n\
+Также присутствует кнопка меню '/reset_conversation', сбрасывающая историю сообщений (необходимо, \
+eсли пользователь хочет поменять тему диалога).\n\
+Данные пользователя хранятся в базе даных на выделенном сервере.")
 
 
 @dp.message_handler(commands=['pay'])
