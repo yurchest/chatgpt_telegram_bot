@@ -1,7 +1,7 @@
 from gpt import *
 import logging
 from decouple import config
-import time
+import asyncio
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ParseMode
 from database.database import *
@@ -30,8 +30,8 @@ def rate_limit_error_handler(func):
         except openai.error.RateLimitError as e:
             delete_last_el()
             retry_time = e.retry_after if hasattr(e, 'retry_after') else 5
-            await message.answer(f"Превышен лимит запросов. Ждёмс... :)")
-            time.sleep(retry_time)
+            # await message.answer(f"Превышен лимит запросов. Ждёмс... :)")
+            await asyncio.sleep(retry_time)
             return await wrapper_func(message)
 
     return wrapper_func
@@ -45,7 +45,7 @@ def recurrent_request_handler(func):
     async def wrapper_func(message):
         global active_requests_id
         if message.from_user.id in active_requests_id:
-            await message.answer(f"Запрос уже отправлен. Ждём ответа")
+            await message.answer(f"Не так быстро. Повторите запрос.")
             return wrapper_func
         active_requests_id.add(message.from_user.id)
         await func(message)
@@ -133,11 +133,12 @@ async def admin(message: types.message):
 
 @dp.message_handler()
 @main_handler
-@recurrent_request_handler
+# @recurrent_request_handler
 @rate_limit_error_handler
 async def main(message: types.message):
+    msg = await message.answer(". . . . . . . . .")
     response = chatgpt_conversation(message.text)
-    await message.answer(response)
+    await bot.edit_message_text(chat_id=message.chat.id, message_id=msg.message_id, text=response)
 
 
 if __name__ == "__main__":
