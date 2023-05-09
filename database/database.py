@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 import pytz
 
-conn = sqlite3.connect('database/openai_telegram.db')
+conn = sqlite3.connect("PATH_TO_DB")
 cursor = conn.cursor()
 
 
