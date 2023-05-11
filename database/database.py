@@ -53,6 +53,8 @@ def get_all_users():
             "register_date": user[3],
             "number_of_requests": user[4],
             "paid": user[5],
+            "paid_number": user[6],
+            "paid_date": user[7]
         })
     return result
 
