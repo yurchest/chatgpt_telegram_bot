@@ -117,6 +117,7 @@ async def pay(message: types.message):
         title="Опата подписки",
         description="Опата подписки Yurchest BOT",
         payload="invoice",
+        start_parameter="paymanet",
         provider_token=YOOKASSA_PAYMENT_TOKEN,
         currency="RUB",
         prices=[types.LabeledPrice(label="Опата подписки", amount=100 * 100)]
