@@ -169,7 +169,11 @@ async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
 @dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
 async def success_payment(message: types.message):
     set_user_paid(message.from_user.id)
-    await message.answer(f"Успешно оплачено: \n\n{message.successful_payment.order_info}")
+    payment_info = message.successful_payment.to_python()
+    str = ""
+    for k, v in payment_info.items():
+        str = str + f"\n{k} = {v}"
+    await message.answer(f"Успешно оплачено: \n\n{str}")
 
 
 @dp.message_handler(commands=['reset_conversation'])
