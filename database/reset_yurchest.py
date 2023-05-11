@@ -8,3 +8,5 @@ if __name__ == "__main__":
                     """
     with conn:
         cursor.execute(sqlite_query)
+
+    set_user_paid(567804607, "2281488")

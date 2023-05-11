@@ -85,4 +85,4 @@ def set_user_paid(telegram_id, paid_number):
                         WHERE telegram_id = ?;
                         """
     with conn:
-        cursor.execute(sqlite_query, (paid_number, telegram_id, current_date,))
+        cursor.execute(sqlite_query, (paid_number, telegram_id, current_date))
