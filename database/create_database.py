@@ -9,7 +9,9 @@ try:
                                 username TEXT NOT NULL UNIQUE,
                                 register_date TEXT NOT NULL,
                                 number_of_requests INTEGER,
-                                paid TEXT NOT NULL
+                                paid TEXT NOT NULL,
+                                paid_number TEXT,
+                                paid_date TEXT
                                 );
                                 '''
 

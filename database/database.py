@@ -75,11 +75,14 @@ def is_user_test_period(telegram_id):
         return False
 
 
-def set_user_paid(telegram_id):
+def set_user_paid(telegram_id, paid_number):
+    current_date = datetime.now(pytz.timezone("Europe/Moscow")).strftime("%Y-%m-%d %H:%M:%S")
     sqlite_query = """
                         UPDATE users
-                        SET paid = "true"
+                        SET paid = "true",
+                        paid_number = ?,
+                        paid_date = ?
                         WHERE telegram_id = ?;
                         """
     with conn:
-        cursor.execute(sqlite_query, (telegram_id,))
+        cursor.execute(sqlite_query, (paid_number, telegram_id, current_date,))
