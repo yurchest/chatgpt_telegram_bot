@@ -163,13 +163,13 @@ async def pay(message: types.message):
 # pre checkout  (must be answered in 10 seconds)
 @dp.pre_checkout_query_handler(lambda query: True)
 async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
-    print("xxx")
     await bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
 
 
 @dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
 async def success_payment(message: types.message):
-    await message.answer(f"Успешно оплачено: \n{message.succesful_payment.order_info}")
+    set_user_paid(message.from_user.id)
+    await message.answer(f"Успешно оплачено: \n\n{message.successful_payment.order_info}")
 
 
 @dp.message_handler(commands=['reset_conversation'])

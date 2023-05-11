@@ -73,3 +73,13 @@ def is_user_test_period(telegram_id):
         return True
     else:
         return False
+
+
+def set_user_paid(telegram_id):
+    sqlite_query = """
+                        UPDATE users
+                        SET paid = "true"
+                        WHERE telegram_id = ?;
+                        """
+    with conn:
+        cursor.execute(sqlite_query, (telegram_id,))
