@@ -137,7 +137,26 @@ async def pay(message: types.message):
         start_parameter="paymanet",
         provider_token=YOOKASSA_PAYMENT_TOKEN,
         currency="RUB",
-        prices=[types.LabeledPrice(label="Оплата подписки", amount=100 * 100)]
+        prices=[types.LabeledPrice(label="Оплата подписки", amount=100 * 100)],
+        provider_data={
+            "receipt": {
+                "items": [
+                    {
+                        "description": "Подписка на Yurchest Chat Bot",
+                        "quantity": "1.00",
+                        "amount":
+                            {
+                                "value": "100.00",
+                                "currency": "RUB",
+                            },
+                        "vat_code": 1,
+                    }],
+                "customer":
+                    {
+                        "email": "yurchest@gmail.com",
+                    }
+            }
+        }
     )
 
 
