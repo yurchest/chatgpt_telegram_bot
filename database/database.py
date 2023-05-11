@@ -60,7 +60,6 @@ def get_all_users():
 def is_user_paid(telegram_id):
     cursor.execute("SELECT paid FROM users WHERE telegram_id = ?", (telegram_id,))
     [is_paid] = cursor.fetchone()  # fetch and unpack the only row our query returns
-    print(is_paid)
     if is_paid == "true":
         return True
     else:

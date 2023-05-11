@@ -131,20 +131,22 @@ async def pay(message: types.message):
             "У вас уже есть полный доступ. Но если вы хотите заплатить еще денюжку, то я всегда рад (^_^)")
     await bot.send_invoice(
         chat_id=message.chat.id,
-        title="Опата подписки",
-        description="Опата подписки Yurchest BOT",
+        title="Оплата подписки",
+        description="Оплата подписки Yurchest BOT",
         payload="invoice",
         start_parameter="paymanet",
         provider_token=YOOKASSA_PAYMENT_TOKEN,
         currency="RUB",
-        prices=[types.LabeledPrice(label="Опата подписки", amount=100 * 100)]
+        prices=[types.LabeledPrice(label="Оплата подписки", amount=100 * 100)]
     )
 
 
 # pre checkout  (must be answered in 10 seconds)
 @dp.pre_checkout_query_handler(lambda query: True)
 async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
+    print("xxx")
     await bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
+
 
 @dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
 async def success_payment(message: types.message):
