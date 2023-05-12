@@ -205,7 +205,7 @@ async def admin(message: types.message):
 @main_handler
 # @recurrent_request_handler
 @rate_limit_error_handler
-async def main(message: types.message, retry=False):
+async def main(message: types.message):
     response = chatgpt_conversation(message.text)
     await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
                                 text=response)
