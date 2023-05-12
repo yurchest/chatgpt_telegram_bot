@@ -1,7 +1,6 @@
 from gpt import *
-
+from config import *
 import logging
-from decouple import config
 import asyncio
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ParseMode
@@ -10,8 +9,6 @@ import os
 
 import json
 
-BOT_TOKEN = config("TELEGRAM_BOT_TOKEN")
-YOOKASSA_PAYMENT_TOKEN = config("YOOKASSA_PAYMENT_TOKEN")
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher(bot)
 # Включаем логирование, чтобы не пропустить важные сообщения
@@ -38,7 +35,7 @@ def rate_limit_error_handler(func):
         except openai.error.InvalidRequestError as e:
             # await message.answer(f"Получился слишком длинный диалог. Попробуйте уменьшить запрос или сбросьте диалог коммандой /reset_conversation")
             await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
-                                text=f"Получился слишком длинный диалог. Попробуйте уменьшить запрос или сбросьте диалог коммандой /reset_conversation")
+                                        text=f"Получился слишком длинный диалог. Попробуйте уменьшить запрос или сбросьте диалог коммандой /reset_conversation")
 
     return wrapper_func
 

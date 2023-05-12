@@ -1,8 +1,8 @@
-from decouple import config
+from config import *
 import openai
 
-API_KEY = config("OPENAI_API_KEY")
-openai.api_key = API_KEY
+
+openai.api_key = API_KEY1
 model_id = 'gpt-3.5-turbo'
 
 conversations = []
