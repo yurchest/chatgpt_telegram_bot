@@ -35,6 +35,10 @@ def rate_limit_error_handler(func):
             # await message.answer(f"Превышен лимит запросов. Ждёмс... :)")
             await asyncio.sleep(retry_time)
             return await wrapper_func(message)
+        except openai.error.InvalidRequestError as e:
+            # await message.answer(f"Получился слишком длинный диалог. Попробуйте уменьшить запрос или сбросьте диалог коммандой /reset_conversation")
+            await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                text=f"Получился слишком длинный диалог. Попробуйте уменьшить запрос или сбросьте диалог коммандой /reset_conversation")
 
     return wrapper_func
 

@@ -9,7 +9,7 @@ if __name__ == "__main__":
     with conn:
         cursor.execute(sqlite_query)
 
-    add_user('Name', "yusername", 2281488)
+    #add_user('Name', "yusername", 2281488)
     print(is_user_paid(2281488))
 
 
