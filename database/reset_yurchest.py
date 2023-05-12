@@ -1,4 +1,4 @@
-from database import *
+from src.database import *
 
 if __name__ == "__main__":
     sqlite_query = """
