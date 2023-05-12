@@ -6,7 +6,7 @@ try:
                                 CREATE TABLE if not EXISTS users (
                                 telegram_id INTEGER PRIMARY KEY,
                                 name TEXT NOT NULL,
-                                username TEXT NOT NULL UNIQUE,
+                                username TEXT,
                                 register_date TEXT NOT NULL,
                                 number_of_requests INTEGER,
                                 paid TEXT NOT NULL,
