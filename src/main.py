@@ -208,7 +208,7 @@ async def admin(message: types.message):
 async def main(message: types.message):
     response = chatgpt_conversation(message.text)
     await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
-                                text=response)
+                                text=response, parse_mode=ParseMode.MARKDOWN)
 
 
 if __name__ == "__main__":
