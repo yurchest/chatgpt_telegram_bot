@@ -104,8 +104,8 @@ def dots_handler(func):
 @main_handler
 async def start(message: types.message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("/reset_conversation"))
-    markup.add(types.KeyboardButton("/help"))
+    # markup.add(types.KeyboardButton("/reset_conversation"))
+    # markup.add(types.KeyboardButton("/help"))
     if message.from_user.username == 'yurchest':
         markup.add(types.KeyboardButton("/admin"))
     init_conversation()
