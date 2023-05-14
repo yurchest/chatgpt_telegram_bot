@@ -1,5 +1,6 @@
 from gpt import *
 from config import *
+import aiogram
 import logging
 import asyncio
 from aiogram import Bot, Dispatcher, executor, types
@@ -207,8 +208,13 @@ async def admin(message: types.message):
 @rate_limit_error_handler
 async def main(message: types.message):
     response = chatgpt_conversation(message.text)
-    await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+    try:
+        await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
                                 text=response, parse_mode=ParseMode.MARKDOWN)
+    except aiogram.utils.exceptions.CantParseEntities:
+        await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                    text=response, parse_mode=None)
+
 
 
 if __name__ == "__main__":
