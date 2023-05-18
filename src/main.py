@@ -176,12 +176,12 @@ async def pay(message: types.message):
 
 
 # pre checkout  (must be answered in 10 seconds)
-@dp.pre_checkout_query_handler(lambda query: True)
+@dp.pre_checkout_query_handler(lambda query: True, state=UserState.some_state)
 async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
 
 
-@dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT)
+@dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT, state=UserState.some_state)
 async def success_payment(message: types.message):
     set_user_paid(message.from_user.id, message.successful_payment.telegram_payment_charge_id)
     await message.answer(
