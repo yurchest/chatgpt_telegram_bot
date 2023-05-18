@@ -127,7 +127,7 @@ async def start(message: types.message, state: FSMContext):
         reply_markup=markup)
 
 
-@dp.message_handler(commands=['help'])
+@dp.message_handler(commands=['help'], state=UserState.some_state)
 async def help(message: types.message):
     await message.answer(
         "Телеграм бот предназнчен для легкого взаимодействия с OpenAI API (ChatGPT).\n\
@@ -139,7 +139,7 @@ eсли пользователь хочет поменять тему диало
 Если что-то не работет пишите мне @yurchest")
 
 
-@dp.message_handler(commands=['pay'])
+@dp.message_handler(commands=['pay'], state=UserState.some_state)
 async def pay(message: types.message):
     if is_user_paid(message.from_user.id):
         await message.answer(
@@ -203,7 +203,7 @@ async def reset_conversation(message, state: FSMContext):
                                 text=f"Диалог сброшен. Чем я могу помочь?")
 
 
-@dp.message_handler(commands=['admin'])
+@dp.message_handler(commands=['admin'], state=UserState.some_state)
 @dots_handler
 @recurrent_request_handler
 @error_handler
@@ -240,8 +240,8 @@ async def main_state(message: types.message, state: FSMContext):
 async def main(message: types.message):
     await UserState.some_state.set()
     await message.answer(
-        f"Произошёл перезапуск сервера. Ваш диалог был сброшен :(\nЯ работаю на этой проблемой. \nПридется написать "
-        f"вопрос еще раз. Чем я могу помочь?")
+        f"Произошёл перезапуск сервера. Ваш диалог был сброшен :(\nЯ работаю на этой проблемой. \nПридется повторить "
+        f"запрос еще раз. Чем я могу помочь?")
 
 
 if __name__ == "__main__":
