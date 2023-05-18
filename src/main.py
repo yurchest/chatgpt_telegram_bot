@@ -47,7 +47,7 @@ def error_handler(func):
         except Exception as ex:
             await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
                                         text=f"Произошла непредвиденная ошибка. Сообщите @yurchest или попробуйте повторить запрос.\n\n {ex}")
-            add_error_to_db(str(ex), message.from_user.username)
+            add_error_to_db(str(ex), message.from_user.id)
 
     return wrapper_func
 
