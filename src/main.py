@@ -207,7 +207,7 @@ async def reset_conversation(message, state: FSMContext):
 @dots_handler
 @recurrent_request_handler
 @error_handler
-async def admin(message: types.message):
+async def admin(message: types.message, state: FSMContext):
     if message.from_user.username == 'yurchest':
         data = get_all_users()
         json_data = json.dumps(data, indent=2, ensure_ascii=False)
