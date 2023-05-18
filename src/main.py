@@ -195,7 +195,7 @@ async def success_payment(message: types.message):
 @recurrent_request_handler
 @error_handler
 async def reset_conversation(message, state: FSMContext):
-    await state.finish()
+    # await state.finish()
     # await UserState.some_state.set()
     # response = init_conversation()
     await state.update_data(conversation=[])
