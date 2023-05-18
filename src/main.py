@@ -218,6 +218,29 @@ async def admin(message: types.message, state: FSMContext):
                                     text="Вы не админ")
 
 
+@dp.message_handler(commands=['show_dialog'], state=UserState.some_state)
+@dots_handler
+@recurrent_request_handler
+@error_handler
+async def show_dialog(message: types.message, state: FSMContext):
+    user_data = await state.get_data()
+    user_conversation = user_data.get('conversation')
+    if not user_conversation:
+        await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                    text="Диалог пуст")
+        return
+    await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                text=f"Весь диалог:", parse_mode=None)
+    for message_conversation in user_conversation:
+        sender = "Неизветно кто"
+        if message_conversation["role"] == "user":
+            sender = "Пользователь"
+        elif message_conversation["role"] == "assistant":
+            sender = "Бот"
+        await message.answer(f"{sender}:\n{'-'*30}\n{message_conversation['content']}\n{'-'*30}")
+    print(user_conversation)
+
+
 @dp.message_handler(state=UserState.some_state)
 @dots_handler
 @main_handler
