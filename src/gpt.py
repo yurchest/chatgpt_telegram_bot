@@ -1,11 +1,11 @@
+
+
 from config import *
 import openai
-
+import aiogram
 
 openai.api_key = API_KEY1
 model_id = 'gpt-3.5-turbo'
-
-conversations = []
 
 
 def get_response(conversation_log):
@@ -16,28 +16,25 @@ def get_response(conversation_log):
     return response
 
 
-def chatgpt_conversation(user_text: str):
-    global conversations
-    conversations.append({'role': 'user', 'content': user_text})
-    response = get_response(conversations)
-    conversations.append({
+def chatgpt_conversation(user_text: str, conversation: list):
+    if conversation:
+        conversation.append({'role': 'user', 'content': user_text})
+    else:
+        conversation = [{'role': 'user', 'content': user_text}]
+    response = get_response(conversation)
+    conversation.append({
         'role': response.choices[0].message.role,
         'content': response.choices[0].message.content.strip()
     })
-    return conversations[-1]['content'].strip()
+    return conversation
 
 
 def init_conversation():
-    global conversations
+    conversation = [{'role': 'system', 'content': 'Сможешь мне помочь?'}]
     # system, user, assistant
-    conversations = [{'role': 'system', 'content': 'Сможешь мне помочь?'}]
-    response = get_response(conversations)
-    conversations.append({
+    response = get_response(conversation)
+    conversation.append({
         'role': response.choices[0].message.role,
         'content': response.choices[0].message.content.strip()
     })
-    return conversations
-
-
-def delete_last_el():
-    conversations.pop()
+    return conversation

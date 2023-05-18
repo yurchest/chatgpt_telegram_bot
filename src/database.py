@@ -88,3 +88,13 @@ def set_user_paid(telegram_id, paid_number):
                         """
     with conn:
         cursor.execute(sqlite_query, (paid_number, current_date, telegram_id))
+
+
+def add_error_to_db(error: str, telegram_id: str):
+    current_date = datetime.now(pytz.timezone("Europe/Moscow")).strftime("%Y-%m-%d %H:%M:%S")
+    sqlite_insert_query = """
+                            INSERT INTO error_logs(date_time, telegram_id, error_message)
+                            VALUES (?,?,?);
+                            """
+    with conn:
+        cursor.execute(sqlite_insert_query, (current_date, telegram_id, error))
