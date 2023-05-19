@@ -5,6 +5,9 @@ try:
     sqlite_create_table_query = '''
                                 CREATE TABLE if not EXISTS error_logs (
                                 date_time TEXT,
+                                filename TEXT,
+                                line INTEGER,
+                                exc_type TEXT,
                                 telegram_id TEXT,
                                 error_message TEXT
                                 );

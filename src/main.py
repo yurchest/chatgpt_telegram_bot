@@ -1,3 +1,6 @@
+import sys
+import os
+
 from gpt import *
 from config import *
 import aiogram
@@ -45,9 +48,17 @@ def error_handler(func):
             await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
                                         text=f"Получился слишком длинный диалог. Попробуйте уменьшить запрос или сбросьте диалог коммандой /reset_conversation")
         except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
-                                        text=f"Произошла непредвиденная ошибка. Сообщите @yurchest или попробуйте повторить запрос.\n\n {ex}")
-            add_error_to_db(str(ex), message.from_user.id)
+                                        text=f"Произошла непредвиденная ошибка. Сообщите @yurchest или попробуйте повторить запрос.\n\n {exc_type.__name__}: {ex}")
+            add_error_to_db(
+                error=str(ex),
+                telegram_id=message.from_user.id,
+                filename=fname,
+                line=exc_tb.tb_lineno,
+                exc_type=exc_type.__name__
+            )
 
     return wrapper_func
 
@@ -208,14 +219,20 @@ async def reset_conversation(message, state: FSMContext):
 @recurrent_request_handler
 @error_handler
 async def admin(message: types.message, state: FSMContext):
-    if message.from_user.username == 'yurchest':
-        data = get_all_users()
-        json_data = json.dumps(data, indent=2, ensure_ascii=False)
-        await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
-                                    text=f"```\n{json_data}```", parse_mode=ParseMode.MARKDOWN)
-    else:
+    if not message.from_user.username == 'yurchest':
         await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
                                     text="Вы не админ")
+        return
+    data = get_all_users()
+    json_data = json.dumps(data, indent=2, ensure_ascii=False)
+    await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
+                                text=f"```\n{json_data}```", parse_mode=ParseMode.MARKDOWN)
+
+    errors = get_last_30_errors()
+    if errors:
+        await message.answer(errors)
+    else:
+        await message.answer(f"Ошибок нет. Все круто")
 
 
 @dp.message_handler(commands=['show_dialog'], state=UserState.some_state)
@@ -237,7 +254,7 @@ async def show_dialog(message: types.message, state: FSMContext):
             sender = "Пользователь"
         elif message_conversation["role"] == "assistant":
             sender = "Бот"
-        await message.answer(f"{sender}:\n{'-'*30}\n{message_conversation['content']}\n{'-'*30}")
+        await message.answer(f"{sender}:\n{'-' * 30}\n{message_conversation['content']}\n{'-' * 30}")
     print(user_conversation)
 
 

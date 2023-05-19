@@ -90,11 +90,35 @@ def set_user_paid(telegram_id, paid_number):
         cursor.execute(sqlite_query, (paid_number, current_date, telegram_id))
 
 
-def add_error_to_db(error: str, telegram_id: str):
+def add_error_to_db(error: str, telegram_id: str, filename: str, line: int, exc_type: type):
     current_date = datetime.now(pytz.timezone("Europe/Moscow")).strftime("%Y-%m-%d %H:%M:%S")
     sqlite_insert_query = """
-                            INSERT INTO error_logs(date_time, telegram_id, error_message)
-                            VALUES (?,?,?);
+                            INSERT INTO error_logs(date_time, filename, line, exc_type, telegram_id, error_message)
+                            VALUES (?,?,?,?,?,?);
                             """
     with conn:
-        cursor.execute(sqlite_insert_query, (current_date, telegram_id, error))
+        cursor.execute(sqlite_insert_query, (current_date, filename, line, str(exc_type), telegram_id, error))
+
+
+def get_last_30_errors() -> str:
+    sqlite_query = """
+                    SELECT date_time, filename, line, exc_type, telegram_id, error_message
+                    FROM error_logs
+                    Order By date_time DESC LIMIT 10
+                    """
+    with conn:
+        cursor.execute(sqlite_query)
+        data = cursor.fetchall()
+        result_text = ""
+        for error in data:
+            result_text += f"{error[0]}| {error[3]}: {error[5]}\n"
+
+    return result_text
+
+
+def clear_errors():
+    sqlite_query = """
+                    DELETE FROM error_logs;
+                    """
+    with conn:
+        cursor.execute(sqlite_query)
