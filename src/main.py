@@ -96,6 +96,7 @@ def main_handler(func):
             )
             await message.answer(f"Чтобы получить полный доступ к боту, поблагодари разработчика монетой :)")
             await pay(message)
+
         if not is_user_test_period(message.from_user.id):
             if not is_user_paid(message.from_user.id):
                 await message.answer(f"Чтобы получить полный доступ к боту, поблагодари разработчика монетой :)")
@@ -280,7 +281,7 @@ async def main_state(message: types.message, state: FSMContext):
 async def main(message: types.message):
     await UserState.some_state.set()
     await message.answer(
-        f"Произошёл перезапуск сервера. Ваш диалог был сброшен :(\nЯ работаю на этой проблемой. \nПридется повторить "
+        f"Недавно было произведено обновлениен бота. Ваш диалог был сброшен :(\nЯ работаю на этой проблемой. \nПридется повторить "
         f"запрос еще раз. Чем я могу помочь?")
 
 
