@@ -51,7 +51,7 @@ def error_handler(func):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
-                                        text=f"Произошла непредвиденная ошибка. Сообщите @yurchest или попробуйте повторить запрос.\n\n {exc_type.__name__}: {ex}")
+                                        text=f"Произошла непредвиденная ошибка. Сообщите @yurchest или попробуйте повторить запрос.\n\n {exc_type.__name__}")
             add_error_to_db(
                 error=str(ex),
                 telegram_id=message.from_user.id,
