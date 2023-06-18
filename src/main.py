@@ -158,6 +158,8 @@ eсли пользователь хочет поменять тему диало
 
 @dp.message_handler(commands=['pay'], state=UserState.some_state)
 async def pay(message: types.message):
+    await message.answer(
+        f"У вас {get_nums_img_generated(message.from_user.id)} изображений для генерации. Оплатите, чтобы добавить 30 изображений.")
     if is_user_paid(message.from_user.id):
         await message.answer(
             "У вас уже есть полный доступ для чата. "
@@ -274,8 +276,6 @@ async def show_dialog(message: types.message, state: FSMContext):
 @error_handler
 async def send_photo(message: types.Message, state: FSMContext):
     if not is_user_paid(message.from_user.id) or not is_user_allow_generate_img(message.from_user.id):
-        await message.answer(
-            f"У вас {get_nums_img_generated(message.from_user.id)} изображений для генерации. Оплатите, чтобы добавить 30 изображений.")
         await pay(message)
         return
     await message.answer(f"Отправьте описание изображения, которое хотите сгенерировать")
