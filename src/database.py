@@ -20,10 +20,10 @@ def is_user_exists(telegram_id):
 def add_user(name: str, username: str, telegram_id: int):
     values = [
         (name, username, telegram_id, datetime.now(pytz.timezone("Europe/Moscow")).strftime("%Y-%m-%d %H:%M:%S"), 1,
-         "false"),
+         "false", 5),
     ]
     sqlite_insert_query = """
-                            INSERT INTO users(name, username, telegram_id, register_date, number_of_requests, paid)
+                            INSERT INTO users(name, username, telegram_id, register_date, number_of_requests, paid, nums_img_generated)
                             VALUES (?,?,?,?,?,?);
                             """
     cursor.executemany(sqlite_insert_query, values)
