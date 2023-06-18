@@ -1,5 +1,3 @@
-
-
 from config import *
 import openai
 import aiogram
@@ -38,3 +36,13 @@ def init_conversation():
         'content': response.choices[0].message.content.strip()
     })
     return conversation
+
+
+def generate_img(prompt: str) -> str:
+    response = openai.Image.create(
+        prompt=prompt,
+        n=1,
+        size="1024x1024"
+    )
+    image_url = response['data'][0]['url']
+    return image_url

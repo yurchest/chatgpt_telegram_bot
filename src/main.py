@@ -12,8 +12,13 @@ from database import *
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.utils import exceptions
+from aiogram.types import InputFile
 
 import json
+
+import io
+import requests
 
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -210,7 +215,8 @@ async def reset_conversation(message, state: FSMContext):
     # await state.finish()
     # await UserState.some_state.set()
     # response = init_conversation()
-    await state.update_data(conversation=[])
+    await state.update_data(conversation=[], generate_img=False)
+    # await state.update_data(generate_img=True)
     await bot.edit_message_text(chat_id=message.chat.id, message_id=active_msg_response[message.message_id],
                                 text=f"Диалог сброшен. Чем я могу помочь?")
 
@@ -259,6 +265,17 @@ async def show_dialog(message: types.message, state: FSMContext):
     print(user_conversation)
 
 
+@dp.message_handler(commands=['generate_img'], state=UserState.some_state)
+# @dots_handler
+@main_handler
+@error_handler
+async def send_photo(message: types.Message, state: FSMContext):
+    await message.answer(f"Отправьте описание изображения, которое хотите сгенерировать")
+    await state.update_data(generate_img=True)
+
+
+
+
 @dp.message_handler(state=UserState.some_state)
 @dots_handler
 @main_handler
@@ -267,6 +284,13 @@ async def show_dialog(message: types.message, state: FSMContext):
 async def main_state(message: types.message, state: FSMContext):
     user_data = await state.get_data()
     user_conversation = user_data.get('conversation')
+    is_generate_img = user_data.get('generate_img')
+    if is_generate_img:
+        image_url = generate_img(message.text)
+        await bot.delete_message(chat_id=message.chat.id, message_id=active_msg_response[message.message_id])
+        await bot.send_photo(chat_id=message.chat.id, photo=image_url)
+        await state.update_data(generate_img=False)
+        return
     response = chatgpt_conversation(message.text, user_conversation)
     await state.update_data(conversation=response)
     try:
