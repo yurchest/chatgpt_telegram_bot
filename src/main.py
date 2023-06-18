@@ -160,7 +160,9 @@ eсли пользователь хочет поменять тему диало
 async def pay(message: types.message):
     if is_user_paid(message.from_user.id):
         await message.answer(
-            "У вас уже есть полный доступ. Но если вы хотите заплатить еще денюжку, то я всегда рад (^_^)")
+            "У вас уже есть полный доступ для чата. "
+            "Но если вы хотите заплатить еще денюжку, то я всегда рад (^_^). "
+            "Оплатив, вы добавите 30 изображений для генерации.")
     await bot.send_invoice(
         chat_id=message.chat.id,
         title="Оплата подписки",
@@ -201,6 +203,7 @@ async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
 @dp.message_handler(content_types=types.ContentType.SUCCESSFUL_PAYMENT, state=UserState.some_state)
 async def success_payment(message: types.message):
     set_user_paid(message.from_user.id, message.successful_payment.telegram_payment_charge_id)
+    add_30_nums_img_generated(message.from_user.id)
     await message.answer(
         f"Успешно оплачено {message.successful_payment.total_amount // 100} {message.successful_payment.currency}! \
 \nНомер платежа:\n{message.successful_payment.telegram_payment_charge_id}")
@@ -270,10 +273,13 @@ async def show_dialog(message: types.message, state: FSMContext):
 @main_handler
 @error_handler
 async def send_photo(message: types.Message, state: FSMContext):
+    if not is_user_paid(message.from_user.id) or not is_user_allow_generate_img(message.from_user.id):
+        await message.answer(
+            f"У вас {get_nums_img_generated(message.from_user.id)} изображений для генерации. Оплатите, чтобы добавить 30 изображений.")
+        await pay(message)
+        return
     await message.answer(f"Отправьте описание изображения, которое хотите сгенерировать")
     await state.update_data(generate_img=True)
-
-
 
 
 @dp.message_handler(state=UserState.some_state)
@@ -287,6 +293,7 @@ async def main_state(message: types.message, state: FSMContext):
     is_generate_img = user_data.get('generate_img')
     if is_generate_img:
         image_url = generate_img(message.text)
+        decrement_nums_img_generated(message.from_user.id)
         await bot.delete_message(chat_id=message.chat.id, message_id=active_msg_response[message.message_id])
         await bot.send_photo(chat_id=message.chat.id, photo=image_url)
         await state.update_data(generate_img=False)

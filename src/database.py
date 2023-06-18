@@ -122,3 +122,38 @@ def clear_errors():
                     """
     with conn:
         cursor.execute(sqlite_query)
+
+
+def is_user_allow_generate_img(telegram_id):
+    cursor.execute("SELECT nums_img_generated FROM users WHERE telegram_id = ?", (telegram_id,))
+    [nums_img_generated] = cursor.fetchone()  # fetch and unpack the only row our query returns
+    if nums_img_generated > 0:
+        return True
+    else:
+        return False
+
+
+def get_nums_img_generated(telegram_id) -> int:
+    cursor.execute("SELECT nums_img_generated FROM users WHERE telegram_id = ?", (telegram_id,))
+    [nums_img_generated] = cursor.fetchone()  # fetch and unpack the only row our query returns
+    return nums_img_generated
+
+
+def add_30_nums_img_generated(telegram_id):
+    sqlite_query = """
+                    UPDATE users
+                    SET nums_img_generated = nums_img_generated + 30
+                    WHERE telegram_id = ?;
+                    """
+    with conn:
+        cursor.execute(sqlite_query, (telegram_id,))
+
+
+def decrement_nums_img_generated(telegram_id):
+    sqlite_query = """
+                    UPDATE users
+                    SET nums_img_generated = nums_img_generated - 1
+                    WHERE telegram_id = ?;
+                    """
+    with conn:
+        cursor.execute(sqlite_query, (telegram_id,))
