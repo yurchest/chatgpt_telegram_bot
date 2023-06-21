@@ -24,7 +24,7 @@ def add_user(name: str, username: str, telegram_id: int):
     ]
     sqlite_insert_query = """
                             INSERT INTO users(name, username, telegram_id, register_date, number_of_requests, paid, nums_img_generated)
-                            VALUES (?,?,?,?,?,?);
+                            VALUES (?,?,?,?,?,?,?);
                             """
     cursor.executemany(sqlite_insert_query, values)
     conn.commit()

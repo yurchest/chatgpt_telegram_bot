@@ -275,7 +275,7 @@ async def show_dialog(message: types.message, state: FSMContext):
 @main_handler
 @error_handler
 async def send_photo(message: types.Message, state: FSMContext):
-    if not is_user_paid(message.from_user.id) or not is_user_allow_generate_img(message.from_user.id):
+    if not is_user_allow_generate_img(message.from_user.id):
         await pay(message)
         return
     await message.answer(f"Отправьте описание изображения, которое хотите сгенерировать")
